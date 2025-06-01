@@ -64,7 +64,7 @@ namespace Bookstore.Mobile.ViewModels
         private async Task GoToLowStockReportAsync()
         {
             _logger.LogInformation("Navigating to Low Stock Report page.");
-            await DisplayAlertAsync("Navigate", "Navigate to Low Stock Report (To be implemented)", "OK");
+            await Shell.Current.DisplaySnackbar("Navigate to Low Stock Report (To be implemented)", duration: TimeSpan.FromSeconds(2));
         }
 
 

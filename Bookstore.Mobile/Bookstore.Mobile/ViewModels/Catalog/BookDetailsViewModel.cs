@@ -291,7 +291,7 @@ namespace Bookstore.Mobile.ViewModels
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("Book {BookId} added/updated in cart successfully.", _actualBookId);
-                    await DisplayAlertAsync("Success", $"Added {QuantityToAdd} x '{BookDetails.Title}' to cart.", "OK");
+                    await Shell.Current.DisplaySnackbar($"Added {QuantityToAdd} x '{BookDetails.Title}' to cart.", duration: TimeSpan.FromSeconds(2));
                 }
                 else
                 {

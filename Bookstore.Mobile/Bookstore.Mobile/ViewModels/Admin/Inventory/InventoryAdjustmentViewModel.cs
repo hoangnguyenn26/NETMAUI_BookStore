@@ -123,7 +123,7 @@ namespace Bookstore.Mobile.ViewModels
                 {
                     var newQuantity = response.Content;
                     _logger.LogInformation("Stock adjusted successfully for Book {BookId}. New quantity: {NewQuantity}", SelectedBookSearchResult!.Id, newQuantity);
-                    await DisplayAlertAsync("Success", $"Stock adjusted successfully.\nNew quantity for '{SelectedBookSearchResult.Title}': {newQuantity}", "OK");
+                    await Shell.Current.DisplaySnackbar($"Stock adjusted successfully. New quantity for '{SelectedBookSearchResult.Title}': {newQuantity}", duration: TimeSpan.FromSeconds(2));
                     ResetForm();
                     await Shell.Current.GoToAsync("..");
                 }

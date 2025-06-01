@@ -240,7 +240,7 @@ namespace Bookstore.Mobile.ViewModels.Admin.Orders
                 {
                     var createdOrder = response.Content;
                     _logger.LogInformation("In-Store Order {OrderId} created successfully.", createdOrder.Id);
-                    await DisplayAlertAsync("Success", $"Order #{createdOrder.Id.ToString().Substring(0, 8).ToUpper()} created successfully!", "OK");
+                    await Shell.Current.DisplaySnackbar($"Order #{createdOrder.Id.ToString().Substring(0, 8).ToUpper()} created successfully!", duration: TimeSpan.FromSeconds(2));
                     ResetAllForm();
                     ErrorMessage = null; // Clear error on success
                     await Shell.Current.GoToAsync($"//{nameof(AdminOrderListPage)}");

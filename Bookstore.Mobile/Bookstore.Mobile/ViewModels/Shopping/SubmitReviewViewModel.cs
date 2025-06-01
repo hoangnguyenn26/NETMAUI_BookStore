@@ -114,7 +114,7 @@ namespace Bookstore.Mobile.ViewModels
                 {
                     _logger.LogInformation("Review submitted successfully for Book {BookId}", BookId);
                     // Thành công, quay lại trang chi tiết sách
-                    await DisplayAlertAsync("Review Submitted", "Thank you for your feedback!", "OK");
+                    await Shell.Current.DisplaySnackbar("Thank you for your feedback!", duration: TimeSpan.FromSeconds(2));
                     await Shell.Current.GoToAsync("..");
                 }
                 else

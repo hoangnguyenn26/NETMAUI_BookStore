@@ -235,7 +235,7 @@ namespace Bookstore.Mobile.ViewModels
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("Stock receipt saved successfully.");
-                    await DisplayAlertAsync("Success", "Stock receipt saved successfully!", "OK");
+                    await Shell.Current.DisplaySnackbar("Stock receipt saved successfully!", duration: TimeSpan.FromSeconds(2));
                     await Shell.Current.GoToAsync("..");
                 }
                 else
