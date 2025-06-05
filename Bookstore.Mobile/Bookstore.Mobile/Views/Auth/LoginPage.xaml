@@ -19,7 +19,7 @@
                    WidthRequest="340">
                 <VerticalStackLayout Spacing="20">
                     <!-- Logo/Icon -->
-                    <Image Source="dotnet_bot.png" HeightRequest="64" WidthRequest="64" HorizontalOptions="Center" Margin="0,0,0,10"/>
+                    <Image Source="logo.png" HeightRequest="64" WidthRequest="64" HorizontalOptions="Center" Margin="0,0,0,10"/>
 
                     <!-- Header -->
                     <Label Text="Welcome Back!"
