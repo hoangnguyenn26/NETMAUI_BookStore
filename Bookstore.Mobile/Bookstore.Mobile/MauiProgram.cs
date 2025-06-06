@@ -1,7 +1,6 @@
 ﻿using Bookstore.Mobile.Handlers;
 using Bookstore.Mobile.Interfaces.Apis;
 using Bookstore.Mobile.Interfaces.Services;
-using Bookstore.Mobile.Mappings;
 using Bookstore.Mobile.Models;
 using Bookstore.Mobile.Services;
 using Bookstore.Mobile.ViewModels;
@@ -70,8 +69,6 @@ namespace Bookstore.Mobile
             builder.Services.AddTransient<AuthHeaderHandler>();
             //Đăng ký Validators
             builder.Services.AddValidatorsFromAssemblyContaining<LoginViewModelValidator>();
-            // ----- Register AutoMapper -----
-            builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
             // ----- Auto-register ViewModels & Views (Transient) -----
             RegisterViewModelsAndViews(builder.Services);

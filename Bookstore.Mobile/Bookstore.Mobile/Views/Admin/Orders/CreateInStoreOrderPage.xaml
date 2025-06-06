@@ -17,13 +17,11 @@
             <Setter Property="TextColor" Value="White" />
             <Setter Property="FontAttributes" Value="Bold" />
             <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Padding" Value="20,12" />
+            <Setter Property="Padding" Value="18,10" />
+            <!-- Adjusted padding for mobile -->
             <Setter Property="FontSize" Value="Medium" />
             <Setter Property="Shadow">
-                <Shadow Brush="{StaticResource Primary}"
-                        Offset="0,4"
-                        Radius="8"
-                        Opacity="0.25" />
+                <Shadow Brush="{StaticResource Primary}" Offset="0,4" Radius="8" Opacity="0.25" />
             </Setter>
             <Setter Property="VisualStateManager.VisualStateGroups">
                 <VisualStateGroupList>
@@ -65,8 +63,11 @@
         <Style x:Key="DangerButton" TargetType="Button">
             <Setter Property="BackgroundColor" Value="Transparent" />
             <Setter Property="TextColor" Value="{StaticResource ErrorLight}" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Padding" Value="8" />
+            <!-- This might be an issue if ErrorLight is only for light theme -->
+            <Setter Property="CornerRadius" Value="8" />
+            <!-- Increased for better tap target with icon -->
+            <Setter Property="Padding" Value="6" />
+            <!-- Adjusted for icon -->
             <Setter Property="FontSize" Value="Small" />
         </Style>
 
@@ -75,26 +76,28 @@
             <Setter Property="Stroke" Value="{AppThemeBinding Light=#E2E8F0, Dark=#475569}" />
             <Setter Property="StrokeThickness" Value="1" />
             <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark=#1E293B}" />
-            <Setter Property="StrokeShape" Value="RoundRectangle 16" />
-            <Setter Property="Padding" Value="20" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+            <!-- Slightly smaller radius for mobile -->
+            <Setter Property="Padding" Value="16" />
+            <!-- Adjusted padding -->
             <Setter Property="Shadow">
                 <Shadow Brush="{AppThemeBinding Light=#64748B, Dark=#000000}"
-                        Offset="0,4"
-                        Radius="12"
-                        Opacity="{AppThemeBinding Light=0.08, Dark=0.3}" />
+                        Offset="0,2" Radius="8" Opacity="{AppThemeBinding Light=0.05, Dark=0.25}" />
+                <!-- Softer shadow -->
             </Setter>
         </Style>
 
         <!-- Gradient Card Style -->
         <Style x:Key="GradientCard" TargetType="Border">
             <Setter Property="StrokeThickness" Value="0" />
-            <Setter Property="StrokeShape" Value="RoundRectangle 12" />
-            <Setter Property="Padding" Value="16" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+            <!-- Slightly smaller radius -->
+            <Setter Property="Padding" Value="12" />
+            <!-- Adjusted padding -->
             <Setter Property="Shadow">
                 <Shadow Brush="{AppThemeBinding Light=#64748B, Dark=#000000}"
-                        Offset="0,2"
-                        Radius="8"
-                        Opacity="{AppThemeBinding Light=0.1, Dark=0.4}" />
+                        Offset="0,2" Radius="6" Opacity="{AppThemeBinding Light=0.08, Dark=0.3}" />
+                <!-- Softer shadow -->
             </Setter>
         </Style>
 
@@ -102,8 +105,10 @@
         <Style x:Key="ModernInputFrame" TargetType="Frame">
             <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F8FAFC, Dark=#334155}" />
             <Setter Property="BorderColor" Value="{AppThemeBinding Light=#E2E8F0, Dark=#475569}" />
-            <Setter Property="Padding" Value="16,12" />
-            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="12,10" />
+            <!-- Adjusted padding -->
+            <Setter Property="CornerRadius" Value="10" />
+            <!-- Slightly smaller radius -->
             <Setter Property="HasShadow" Value="False" />
         </Style>
 
@@ -111,35 +116,38 @@
         <Style x:Key="ErrorFrame" TargetType="Frame">
             <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FEF2F2, Dark=#7F1D1D}" />
             <Setter Property="BorderColor" Value="{AppThemeBinding Light=#FCA5A5, Dark=#DC2626}" />
-            <Setter Property="Padding" Value="16" />
-            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="12" />
+            <!-- Adjusted padding -->
+            <Setter Property="CornerRadius" Value="10" />
             <Setter Property="HasShadow" Value="False" />
         </Style>
 
         <!-- Icons with improved colors -->
-        <FontImageSource x:Key="UserGroupIcon" Glyph="&#xe7ef;" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#3B82F6, Dark=#60A5FA}" Size="22" />
-        <FontImageSource x:Key="SearchIcon" Glyph="&#xe8b6;" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#64748B, Dark=#94A3B8}" Size="20" />
-        <FontImageSource x:Key="WarningIcon" Glyph="&#xe002;" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#DC2626, Dark=#F87171}" Size="20" />
-        <FontImageSource x:Key="ReceiptIcon" Glyph="&#xe8b0;" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#059669, Dark=#34D399}" Size="24" />
-        <FontImageSource x:Key="ShoppingCartIcon" Glyph="&#xe8cc;" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#3B82F6, Dark=#60A5FA}" Size="22" />
-        <FontImageSource x:Key="PaymentIcon" Glyph="&#xe8d7;" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#7C3AED, Dark=#A78BFA}" Size="22" />
-        <FontImageSource x:Key="DeleteIcon" Glyph="&#xe872;" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#DC2626, Dark=#F87171}" Size="20" />
+        <FontImageSource x:Key="UserGroupIcon" Glyph="" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#3B82F6, Dark=#60A5FA}" Size="20" />
+        <FontImageSource x:Key="SearchIcon" Glyph="" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#64748B, Dark=#94A3B8}" Size="18" />
+        <FontImageSource x:Key="WarningIcon" Glyph="" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#DC2626, Dark=#F87171}" Size="20" />
+        <FontImageSource x:Key="ReceiptIcon" Glyph="" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#059669, Dark=#34D399}" Size="22" />
+        <FontImageSource x:Key="ShoppingCartIcon" Glyph="" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#3B82F6, Dark=#60A5FA}" Size="20" />
+        <FontImageSource x:Key="PaymentIcon" Glyph="" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#7C3AED, Dark=#A78BFA}" Size="20" />
+        <FontImageSource x:Key="DeleteIcon" Glyph="" FontFamily="MaterialSymbolsRounded" Color="{AppThemeBinding Light=#EF4444, Dark=#F87171}" Size="18" />
+        <!-- Standardized size -->
     </ContentPage.Resources>
 
     <Grid RowDefinitions="*,Auto">
         <!-- Main Content -->
         <ScrollView Grid.Row="0">
-            <VerticalStackLayout Padding="16,20,16,10" Spacing="24">
+            <VerticalStackLayout Padding="16,16,16,10" Spacing="18">
+                <!-- Adjusted Padding and Spacing -->
                 <!-- Header with improved typography -->
-                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
                     <Label Text="✨ Create New Order"
-                           FontSize="28"
-                           FontAttributes="Bold"
+                           FontSize="24"
+                        FontAttributes="Bold"
                            TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}"
                            HorizontalOptions="Center" />
-                    <Label Text="Add books and process in-store purchases"
-                           FontSize="16"
-                           TextColor="{AppThemeBinding Light=#64748B, Dark=#94A3B8}"
+                        <Label Text="Add books and process in-store purchases"
+                           FontSize="14"
+                            TextColor="{AppThemeBinding Light=#64748B, Dark=#94A3B8}"
                            HorizontalOptions="Center" />
                 </VerticalStackLayout>
 
@@ -148,19 +156,19 @@
                       BackgroundColor="{AppThemeBinding Light=#F8FAFC80, Dark=#0F172A80}" 
                       ZIndex="100"
                       Padding="20">
-                    <Border StrokeShape="RoundRectangle 16"
+                    <Border StrokeShape="RoundRectangle 12"
                             BackgroundColor="{AppThemeBinding Light=White, Dark=#1E293B}"
-                            Padding="24"
+                            Padding="20"
                             HorizontalOptions="Center"
                             VerticalOptions="Center">
-                        <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
+                        <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
                             <ActivityIndicator IsRunning="{Binding IsBusy}"
                                              Color="{StaticResource Primary}"
-                                             WidthRequest="32"
-                                             HeightRequest="32" />
+                                             WidthRequest="30"
+                                             HeightRequest="30" />
                             <Label Text="Processing..."
-                                   FontSize="Medium"
-                                   TextColor="{AppThemeBinding Light=#64748B, Dark=#94A3B8}"
+                                   FontSize="Small"
+                                TextColor="{AppThemeBinding Light=#64748B, Dark=#94A3B8}"
                                    HorizontalOptions="Center" />
                         </VerticalStackLayout>
                     </Border>
@@ -169,45 +177,41 @@
                 <!-- Enhanced Error Message -->
                 <Frame Style="{StaticResource ErrorFrame}"
                        IsVisible="{Binding HasError}">
-                    <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
-                        <Image Source="{StaticResource WarningIcon}" WidthRequest="24" HeightRequest="24" />
+                    <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                        <Image Source="{StaticResource WarningIcon}" WidthRequest="22" HeightRequest="22" />
                         <Label Text="{Binding ErrorMessage}"
-                               FontSize="Medium"
-                               TextColor="{AppThemeBinding Light=#DC2626, Dark=#F87171}"
-                               VerticalOptions="Center"
-                               HorizontalOptions="Start" />
+                               FontSize="Small"
+                            TextColor="{AppThemeBinding Light=#B91C1C, Dark=#FCA5A5}"
+                            VerticalOptions="Center"
+                               HorizontalOptions="StartAndExpand" />
                     </HorizontalStackLayout>
                 </Frame>
 
                 <!-- Customer Selection Section -->
                 <Border Style="{StaticResource SectionBorder}">
-                    <VerticalStackLayout Spacing="16">
+                    <VerticalStackLayout Spacing="12">
+                        <!-- Adjusted spacing -->
                         <!-- Section Header -->
-                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
-                            <Image Source="{StaticResource UserGroupIcon}" WidthRequest="24" HeightRequest="24" />
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                            <Image Source="{StaticResource UserGroupIcon}" WidthRequest="22" HeightRequest="22" />
                             <Label Text="Customer Information" 
                                    FontAttributes="Bold" 
-                                   FontSize="18"
-                                   TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
-                            <Label Text="(Optional)" 
-                                   FontSize="14"
-                                   TextColor="{AppThemeBinding Light=#64748B, Dark=#94A3B8}"
+                                   FontSize="16"
+                                TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
+                                <Label Text="(Optional)" 
+                                   FontSize="12"
+                                    TextColor="{AppThemeBinding Light=#64748B, Dark=#94A3B8}"
                                    VerticalOptions="End" />
                         </HorizontalStackLayout>
 
                         <!-- Modern Search Bar -->
-                        <Border StrokeShape="RoundRectangle 12"
+                        <Border StrokeShape="RoundRectangle 10"
                                 BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#334155}"
                                 Stroke="{AppThemeBinding Light=#E2E8F0, Dark=#475569}"
                                 StrokeThickness="1"
-                                Padding="4">
+                                Padding="2">
+                            <!-- Adjusted padding -->
                             <Grid ColumnDefinitions="Auto,*,Auto">
-                                <Image Grid.Column="0" 
-                                       Source="{StaticResource SearchIcon}" 
-                                       WidthRequest="20" 
-                                       HeightRequest="20" 
-                                       VerticalOptions="Center" 
-                                       Margin="12,0" />
                                 <SearchBar Grid.Column="1" 
                                           Placeholder="Search by username or email..." 
                                           Text="{Binding CustomerSearchTerm}" 
@@ -215,7 +219,8 @@
                                           BackgroundColor="Transparent"
                                           PlaceholderColor="{AppThemeBinding Light=#94A3B8, Dark=#64748B}"
                                           TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}"
-                                          FontSize="16" />
+                                          FontSize="15" />
+                                <!-- Adjusted font size -->
                             </Grid>
                         </Border>
 
@@ -224,26 +229,30 @@
                                         SelectionMode="Single"
                                         SelectedItem="{Binding SelectedCustomer}"
                                         IsVisible="{Binding ShowCustomerSearchResults}"
-                                        MaximumHeightRequest="200">
+                                        MaximumHeightRequest="180">
+                            <!-- Adjusted height -->
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="dto:UserDto">
                                     <Border Style="{StaticResource GradientCard}" 
                                             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#334155}"
-                                            Margin="0,4">
-                                        <Grid Padding="16" ColumnDefinitions="*,Auto">
-                                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                            Margin="0,2,0,2">
+                                        <!-- Adjusted margin -->
+                                        <Grid Padding="12" ColumnDefinitions="*,Auto">
+                                            <!-- Adjusted padding -->
+                                            <VerticalStackLayout Grid.Column="0" Spacing="2">
                                                 <Label Text="{Binding UserName}" 
                                                        FontAttributes="Bold" 
-                                                       FontSize="16"
-                                                       TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
-                                                <Label Text="{Binding Email}" 
-                                                       FontSize="14" 
-                                                       TextColor="{AppThemeBinding Light=#64748B, Dark=#94A3B8}" />
+                                                       FontSize="15"
+                                                    TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
+                                                    <Label Text="{Binding Email}" 
+                                                       FontSize="13"
+                                                        TextColor="{AppThemeBinding Light=#64748B, Dark=#94A3B8}" />
                                             </VerticalStackLayout>
                                             <Label Grid.Column="1" 
                                                    Text="Select" 
                                                    TextColor="{StaticResource Primary}" 
                                                    FontAttributes="Bold"
+                                                   FontSize="Small"
                                                    VerticalOptions="Center" />
                                         </Grid>
                                     </Border>
@@ -253,25 +262,27 @@
 
                         <!-- Selected Customer Display -->
                         <Border IsVisible="{Binding IsCustomerSelected}"
-                                StrokeShape="RoundRectangle 12"
+                                StrokeShape="RoundRectangle 10"
                                 BackgroundColor="{AppThemeBinding Light=#F0FDF4, Dark=#064E3B}"
                                 Stroke="{AppThemeBinding Light=#22C55E, Dark=#16A34A}"
                                 StrokeThickness="1"
-                                Padding="16">
-                            <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                                Padding="12">
+                            <!-- Adjusted padding -->
+                            <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
                                 <Label Text="✓" 
-                                       FontSize="18" 
+                                       FontSize="16" 
                                        FontAttributes="Bold"
                                        TextColor="{AppThemeBinding Light=#22C55E, Dark=#4ADE80}" />
                                 <Label Text="{Binding SelectedCustomerText}" 
-                                       FontSize="16" 
-                                       FontAttributes="Bold"
+                                       FontSize="15" 
+                                    FontAttributes="Bold"
                                        TextColor="{AppThemeBinding Light=#15803D, Dark=#4ADE80}"
                                        VerticalOptions="Center"
                                        HorizontalOptions="StartAndExpand" />
-                                <Button Text="Clear"
+                                    <Button Text="Clear"
                                         Command="{Binding ClearCustomerCommand}"
-                                        Style="{StaticResource SecondaryButton}" />
+                                        Style="{StaticResource SecondaryButton}"
+                                        Padding="10,6" />
                             </HorizontalStackLayout>
                         </Border>
                     </VerticalStackLayout>
@@ -279,29 +290,23 @@
 
                 <!-- Order Items Section -->
                 <Border Style="{StaticResource SectionBorder}">
-                    <VerticalStackLayout Spacing="16">
+                    <VerticalStackLayout Spacing="12">
                         <!-- Section Header -->
-                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
-                            <Image Source="{StaticResource ShoppingCartIcon}" WidthRequest="24" HeightRequest="24" />
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                            <Image Source="{StaticResource ShoppingCartIcon}" WidthRequest="22" HeightRequest="22" />
                             <Label Text="Order Items" 
                                    FontAttributes="Bold" 
-                                   FontSize="18"
+                                   FontSize="16"
                                    TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
                         </HorizontalStackLayout>
 
                         <!-- Book Search -->
-                        <Border StrokeShape="RoundRectangle 12"
+                        <Border StrokeShape="RoundRectangle 10"
                                 BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#334155}"
                                 Stroke="{AppThemeBinding Light=#E2E8F0, Dark=#475569}"
                                 StrokeThickness="1"
-                                Padding="4">
+                                Padding="2">
                             <Grid ColumnDefinitions="Auto,*">
-                                <Image Grid.Column="0" 
-                                       Source="{StaticResource SearchIcon}" 
-                                       WidthRequest="20" 
-                                       HeightRequest="20" 
-                                       VerticalOptions="Center" 
-                                       Margin="12,0" />
                                 <SearchBar Grid.Column="1" 
                                           Placeholder="Search books to add..." 
                                           Text="{Binding BookSearchTerm}" 
@@ -309,7 +314,7 @@
                                           BackgroundColor="Transparent"
                                           PlaceholderColor="{AppThemeBinding Light=#94A3B8, Dark=#64748B}"
                                           TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}"
-                                          FontSize="16" />
+                                          FontSize="15" />
                             </Grid>
                         </Border>
 
@@ -318,39 +323,42 @@
                                         SelectionMode="Single"
                                         SelectedItem="{Binding SelectedBookToAdd}"
                                         IsVisible="{Binding ShowBookSearchResults}"
-                                        MaximumHeightRequest="250">
+                                        MaximumHeightRequest="220">
+                            <!-- Adjusted height -->
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="dto:BookDto">
                                     <Border Style="{StaticResource GradientCard}" 
                                             BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#334155}"
-                                            Margin="0,4">
-                                        <Grid Padding="16" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                            Margin="0,2,0,2">
+                                        <Grid Padding="10" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                                             <Border Grid.Column="0"
-                                                    StrokeShape="RoundRectangle 8"
+                                                    StrokeShape="RoundRectangle 6"
                                                     BackgroundColor="{AppThemeBinding Light=#E2E8F0, Dark=#475569}"
-                                                    WidthRequest="50"
-                                                    HeightRequest="70">
+                                                    WidthRequest="45"
+                                                    HeightRequest="65">
                                                 <Image Source="{Binding CoverImageUrl, TargetNullValue='dotnet_bot.png', FallbackValue='dotnet_bot.png'}"
-                                                       Aspect="AspectFit" />
+                                                       Aspect="AspectFill" />
                                             </Border>
-                                            <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                                                 <Label Text="{Binding Title}" 
                                                        FontAttributes="Bold" 
                                                        LineBreakMode="TailTruncation"
-                                                       FontSize="16"
+                                                       MaxLines="2"
+                                                    FontSize="15"
                                                        TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
-                                                <Label Text="{Binding Price, StringFormat='{0:C}'}"
-                                                       FontSize="14"
+                                                    <Label Text="{Binding Price, StringFormat='{0:C}'}"
+                                                       FontSize="13"
                                                        FontAttributes="Bold"
                                                        TextColor="{AppThemeBinding Light=#059669, Dark=#34D399}" />
-                                                <Label Text="{Binding StockQuantity, StringFormat='Stock: {0}'}"
-                                                       FontSize="12"
+                                                    <Label Text="{Binding StockQuantity, StringFormat='Stock: {0}'}"
+                                                       FontSize="11"
                                                        TextColor="{AppThemeBinding Light=#64748B, Dark=#94A3B8}" />
                                             </VerticalStackLayout>
                                             <Label Grid.Column="2"
                                                    Text="Add"
                                                    TextColor="{StaticResource Primary}"
                                                    FontAttributes="Bold"
+                                                   FontSize="Small"
                                                    VerticalOptions="Center" />
                                         </Grid>
                                     </Border>
@@ -360,16 +368,16 @@
 
                         <!-- Quantity Selection -->
                         <Grid ColumnDefinitions="*,Auto,Auto" 
-                              ColumnSpacing="12" 
+                              ColumnSpacing="10" 
                               IsVisible="{Binding IsBookSelectedForDetail}">
-                            <Frame Grid.Column="0" 
-                                   Style="{StaticResource ModernInputFrame}">
+                            <Frame Grid.Column="0" Style="{StaticResource ModernInputFrame}">
                                 <HorizontalStackLayout Spacing="8">
                                     <Entry Placeholder="Qty"
                                            Keyboard="Numeric"
                                            Text="{Binding NewItemQuantity}"
                                            HorizontalTextAlignment="Center"
-                                           WidthRequest="60"
+                                           WidthRequest="50"
+                                           FontSize="15"
                                            BackgroundColor="Transparent" />
                                     <Stepper Minimum="1"
                                              Maximum="100"
@@ -381,18 +389,21 @@
                                     Text="Add"
                                     Command="{Binding AddItemToOrderCommand}"
                                     IsEnabled="{Binding CanAddItem}"
-                                    Style="{StaticResource PrimaryButton}" />
+                                    Style="{StaticResource PrimaryButton}" 
+                                    Padding="16,10"/>
+                            <!-- Adjusted specific button padding -->
                             <Button Grid.Column="2" 
                                     Text="Clear"
                                     Command="{Binding ClearSelectedBookCommand}"
-                                    Style="{StaticResource SecondaryButton}" />
+                                    Style="{StaticResource SecondaryButton}" 
+                                    Padding="16,10"/>
                         </Grid>
 
                         <!-- Current Order Items -->
-                        <VerticalStackLayout IsVisible="{Binding HasOrderDetails}" Spacing="12">
+                        <VerticalStackLayout IsVisible="{Binding HasOrderDetails}" Spacing="10">
                             <Label Text="📦 Current Items" 
                                    FontAttributes="Bold"
-                                   FontSize="16"
+                                   FontSize="15"
                                    TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
 
                             <CollectionView ItemsSource="{Binding CurrentOrderDetails}">
@@ -400,28 +411,29 @@
                                     <DataTemplate x:DataType="dto_instoreorder:InStoreOrderDetailViewModel">
                                         <Border Style="{StaticResource GradientCard}" 
                                                 BackgroundColor="{AppThemeBinding Light=White, Dark=#1E293B}"
-                                                Margin="0,4">
-                                            <Grid Padding="16" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
+                                                Margin="0,2,0,2">
+                                            <Grid Padding="12" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
                                                 <Label Grid.Column="0"
                                                        Text="{Binding BookTitle}"
                                                        VerticalOptions="Center"
                                                        LineBreakMode="TailTruncation"
-                                                       FontSize="16"
+                                                       MaxLines="2"
+                                                       FontSize="15"
                                                        FontAttributes="Bold"
                                                        TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
                                                 <Border Grid.Column="1"
                                                         BackgroundColor="{AppThemeBinding Light=#F1F5F9, Dark=#334155}"
-                                                        StrokeShape="RoundRectangle 12"
-                                                        Padding="8,4">
+                                                        StrokeShape="RoundRectangle 8"
+                                                        Padding="6,3">
                                                     <Label Text="{Binding Quantity, StringFormat='×{0}'}"
-                                                           FontSize="14"
+                                                           FontSize="13"
                                                            FontAttributes="Bold"
                                                            TextColor="{AppThemeBinding Light=#3B82F6, Dark=#60A5FA}" />
                                                 </Border>
                                                 <Label Grid.Column="2"
                                                        Text="{Binding TotalItemPrice, StringFormat='{0:C}'}"
                                                        VerticalOptions="Center"
-                                                       FontSize="16"
+                                                       FontSize="15"
                                                        FontAttributes="Bold"
                                                        TextColor="{AppThemeBinding Light=#059669, Dark=#34D399}" />
                                                 <Button Grid.Column="3"
@@ -442,13 +454,13 @@
 
                 <!-- Payment and Notes Section -->
                 <Border Style="{StaticResource SectionBorder}">
-                    <VerticalStackLayout Spacing="16">
+                    <VerticalStackLayout Spacing="12">
                         <!-- Section Header -->
-                        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
-                            <Image Source="{StaticResource PaymentIcon}" WidthRequest="24" HeightRequest="24" />
-                            <Label Text="Payment &amp; Notes" 
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                            <Image Source="{StaticResource PaymentIcon}" WidthRequest="22" HeightRequest="22" />
+                            <Label Text="Payment &amp; Notes"
                                    FontAttributes="Bold" 
-                                   FontSize="18"
+                                   FontSize="16"
                                    TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
                         </HorizontalStackLayout>
 
@@ -458,23 +470,24 @@
                                     ItemsSource="{Binding AvailablePaymentMethods}"
                                     SelectedItem="{Binding SelectedPaymentMethod}"
                                     ItemDisplayBinding="{Binding Converter={StaticResource PaymentMethodToStringConverter}}"
-                                    FontSize="16"
+                                    FontSize="15"
                                     TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}" />
                         </Frame>
 
                         <!-- Staff Notes -->
-                        <Frame Style="{StaticResource ModernInputFrame}" HeightRequest="120">
+                        <Frame Style="{StaticResource ModernInputFrame}" MinimumHeightRequest="100">
+                            <!-- Use MinHeightRequest -->
                             <Editor Placeholder="Add staff notes (optional)..."
                                     Text="{Binding StaffNotes}"
                                     AutoSize="TextChanges"
-                                    FontSize="16"
+                                    FontSize="15"
                                     PlaceholderColor="{AppThemeBinding Light=#94A3B8, Dark=#64748B}"
                                     TextColor="{AppThemeBinding Light=#1E293B, Dark=#F1F5F9}"
                                     BackgroundColor="Transparent" />
                         </Frame>
 
                         <Label Text="{Binding StaffNotes.Length, StringFormat='{0}/200 characters'}"
-                               FontSize="12"
+                               FontSize="11"
                                TextColor="{AppThemeBinding Light=#64748B, Dark=#94A3B8}"
                                IsVisible="{Binding StaffNotes, Converter={StaticResource StringLengthGreaterThanZeroConverter}}"
                                HorizontalOptions="End" />
@@ -482,17 +495,17 @@
                 </Border>
 
                 <!-- Order Total -->
-                <Border StrokeShape="RoundRectangle 16"
+                <Border StrokeShape="RoundRectangle 12"
                         BackgroundColor="{AppThemeBinding Light=#F0FDF4, Dark=#064E3B}"
                         Stroke="{AppThemeBinding Light=#22C55E, Dark=#16A34A}"
-                        StrokeThickness="2"
-                        Padding="20">
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
-                        <Image Source="{StaticResource ReceiptIcon}" WidthRequest="28" HeightRequest="28" />
+                        StrokeThickness="1.5"
+                        Padding="16">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                        <Image Source="{StaticResource ReceiptIcon}" WidthRequest="26" HeightRequest="26" />
                         <Label Text="{Binding OrderTotalAmount, StringFormat='Total: {0:C}'}" 
                                FontAttributes="Bold" 
-                               FontSize="24"
-                               TextColor="{AppThemeBinding Light=#15803D, Dark=#4ADE80}" />
+                               FontSize="20"
+                            TextColor="{AppThemeBinding Light=#15803D, Dark=#4ADE80}" />
                     </HorizontalStackLayout>
                 </Border>
             </VerticalStackLayout>
@@ -502,20 +515,20 @@
         <Border Grid.Row="1"
                 BackgroundColor="{AppThemeBinding Light=White, Dark=#1E293B}"
                 StrokeThickness="0"
-                Padding="16,12,16,16">
+                Padding="16,12,16,12">
+            <!-- Consistent padding -->
             <Border.Shadow>
                 <Shadow Brush="{AppThemeBinding Light=#64748B, Dark=#000000}"
-                        Offset="0,-4"
-                        Radius="12"
-                        Opacity="{AppThemeBinding Light=0.1, Dark=0.4}" />
+                        Offset="0,-3" Radius="10" Opacity="{AppThemeBinding Light=0.08, Dark=0.35}" />
+                <!-- Softer shadow -->
             </Border.Shadow>
             <Button Text="🛒 Create Order"
                     Command="{Binding CreateOrderCommand}"
                     IsEnabled="{Binding CanExecuteCreateOrder}"
                     Style="{StaticResource PrimaryButton}"
-                    FontSize="18"
-                    HeightRequest="56"
-                    CornerRadius="16" />
+                    FontSize="16"
+                HeightRequest="52"
+                CornerRadius="14" />
         </Border>
     </Grid>
 </ContentPage>

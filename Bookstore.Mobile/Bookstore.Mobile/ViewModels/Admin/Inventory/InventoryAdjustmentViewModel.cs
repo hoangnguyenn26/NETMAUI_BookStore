@@ -1,12 +1,13 @@
 ﻿using Bookstore.Mobile.Enums;
+using Bookstore.Mobile.Helpers;
 using Bookstore.Mobile.Interfaces.Apis;
 using Bookstore.Mobile.Models;
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using Bookstore.Mobile.Helpers;
 
 namespace Bookstore.Mobile.ViewModels
 {
