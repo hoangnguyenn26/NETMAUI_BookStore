@@ -86,14 +86,17 @@
                                             HorizontalOptions="End"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WishlistViewModel}}, Path=RemoveFromWishlistCommand}"
                                             CommandParameter="{Binding Book.Id}"/>
-
-                                    <!-- Details button, cải thiện cho Windows -->
+                                    
                                     <Button Grid.Column="3"
                                             Padding="5,0"
                                             VerticalOptions="Center"
                                             HorizontalOptions="End"
+                                            Background="White"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:WishlistViewModel}}, Path=GoToBookDetailsCommand}"
                                             CommandParameter="{Binding Book.Id}">
+                                        <Button.ImageSource>
+                                            <FontImageSource FontFamily="MaterialSymbolsRounded" Glyph="&#xE5CC;" Color="{StaticResource PrimaryLight}" Size="24"/>
+                                        </Button.ImageSource>
                                     </Button>
                                 </Grid>
                             </Border>
