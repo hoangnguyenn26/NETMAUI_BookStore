@@ -1,22 +1,25 @@
 using Bookstore.Mobile.ViewModels;
 
-namespace Bookstore.Mobile.Views;
-
-public partial class AdminUserListPage : ContentPage
+namespace Bookstore.Mobile.Views
 {
-    private readonly AdminUserListViewModel _viewModel;
-    public AdminUserListPage(AdminUserListViewModel viewModel)
+    public partial class AdminUserListPage : ContentPage
     {
-        InitializeComponent();
-        _viewModel = viewModel;
-        BindingContext = _viewModel;
-    }
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        if (BindingContext is AdminUserListViewModel vm)
+        private readonly AdminUserListViewModel _viewModel;
+
+        public AdminUserListPage(AdminUserListViewModel viewModel)
         {
-            vm.OnAppearing();
+            InitializeComponent();
+            _viewModel = viewModel;
+            BindingContext = _viewModel;
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            if (BindingContext is AdminUserListViewModel vm)
+            {
+                vm.OnAppearing();
+            }
         }
     }
 }

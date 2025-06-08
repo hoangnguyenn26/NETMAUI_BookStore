@@ -12,163 +12,156 @@ namespace Bookstore.Mobile.ViewModels
     {
         private readonly IAdminUserApi _userApi;
         private readonly ILogger<AdminUserListViewModel> _logger;
-        private CancellationTokenSource _filterDebounceCts = new();
 
         private int _currentPage = 1;
-        private const int PageSize = 20;
-        private bool _initialLoadPending = true;
+        private const int PageSize = 15;
+        private int _totalUserCount = 0;
+        private bool _isInitialized = false;
 
-        public ObservableCollection<string> AvailableRoles { get; } = new() { "All", "Admin", "Staff", "User" };
-        public ObservableCollection<string> AvailableStatuses { get; } = new() { "All", "Active", "Inactive" };
+        public AdminUserListViewModel(IAdminUserApi userApi, ILogger<AdminUserListViewModel> logger)
+        {
+            _userApi = userApi ?? throw new ArgumentNullException(nameof(userApi));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            Title = "Manage Users";
+            Users = new ObservableCollection<UserDto>();
+            AvailableRoles = new ObservableCollection<string> { "All", "Admin", "Staff", "User" };
+            AvailableStatuses = new ObservableCollection<string> { "All", "Active", "Inactive" };
+            SelectedRoleFilter = "All";
+            SelectedStatusFilter = "All";
+        }
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(HasFiltersApplied))]
-        private string _selectedRoleFilter = "All";
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(HasFiltersApplied))]
-        private string _selectedStatusFilter = "All";
-
-        [ObservableProperty]
-        private ObservableCollection<UserDto> _users = new();
+        private ObservableCollection<UserDto> _users;
 
         [ObservableProperty]
         private string? _searchTerm;
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(LoadMoreUsersCommand))]
-        private bool _canLoadMore = true;
+        private string _selectedRoleFilter;
 
         [ObservableProperty]
-        private bool _isRefreshing; // Added for RefreshView
+        private string _selectedStatusFilter;
 
-        public bool HasFiltersApplied => SelectedRoleFilter != "All" || SelectedStatusFilter != "All";
+        [ObservableProperty]
+        private string? _pagingInfo;
 
-        public AdminUserListViewModel(
-            IAdminUserApi userApi,
-            ILogger<AdminUserListViewModel> logger)
-        {
-            _userApi = userApi ?? throw new ArgumentNullException(nameof(userApi));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            Title = "Admin Users";
-        }
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CanLoadMore))]
+        private bool _isLoadingMore;
 
-        async partial void OnSelectedRoleFilterChanged(string value) => await DebouncedFilterChange();
-        async partial void OnSelectedStatusFilterChanged(string value) => await DebouncedFilterChange();
+        [ObservableProperty]
+        private bool _canLoadMore = true;
 
-        private async Task DebouncedFilterChange()
-        {
-            try
-            {
-                _filterDebounceCts.Cancel();
-                _filterDebounceCts.Dispose();
-                _filterDebounceCts = new CancellationTokenSource();
+        public ObservableCollection<string> AvailableRoles { get; }
+        public ObservableCollection<string> AvailableStatuses { get; }
 
-                await Task.Delay(500, _filterDebounceCts.Token);
-                await LoadUsers(true);
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.LogDebug("Filter change debounced/cancelled.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in debounced filter change.");
-                ErrorMessage = "Error applying filters. Please try again.";
-            }
-        }
+        async partial void OnSelectedRoleFilterChanged(string value) => await LoadUsersAsync(true);
+        async partial void OnSelectedStatusFilterChanged(string value) => await LoadUsersAsync(true);
 
         [RelayCommand]
-        private async Task ClearFilters()
+        private async Task LoadUsersAsync(bool isRefreshing = false)
         {
-            if (HasFiltersApplied)
-            {
-                SelectedRoleFilter = "All";
-                SelectedStatusFilter = "All";
-                await LoadUsers(true);
-            }
-        }
+            if (IsBusy && !isRefreshing) return;
 
-        [RelayCommand]
-        private async Task LoadUsers(bool isRefreshing = false)
-        {
             await RunSafeAsync(async () =>
             {
-                _logger.LogInformation("Loading users (Page: {Page}, Refreshing: {IsRefreshing})", _currentPage, isRefreshing);
+                if (_isLoadingMore || (!isRefreshing && !_canLoadMore)) return;
 
                 if (isRefreshing)
                 {
                     _currentPage = 1;
                     Users.Clear();
-                    CanLoadMore = true;
+                    _canLoadMore = true;
+                    _totalUserCount = 0;
                 }
 
-                bool? statusFilter = SelectedStatusFilter switch
+                string? roleFilterParam = (SelectedRoleFilter == "All") ? null : SelectedRoleFilter;
+                bool? statusFilterParam = null;
+                if (SelectedStatusFilter == "Active")
                 {
-                    "Active" => true,
-                    "Inactive" => false,
-                    _ => null
-                };
+                    statusFilterParam = true;
+                }
+                else if (SelectedStatusFilter == "Inactive")
+                {
+                    statusFilterParam = false;
+                }
 
-                var response = await _userApi.GetUsers(
-                    _currentPage,
-                    PageSize,
-                    SelectedRoleFilter != "All" ? SelectedRoleFilter : null,
-                    statusFilter);
+                _logger.LogInformation("Loading admin users. Role: {Role}, Status: {Status}, Search: {Search}, Page: {Page}",
+                    roleFilterParam ?? "All", statusFilterParam?.ToString() ?? "All", SearchTerm ?? "None", _currentPage);
+
+                var response = await _userApi.GetUsers(_currentPage, PageSize, roleFilterParam, statusFilterParam, SearchTerm);
 
                 if (response.IsSuccessStatusCode && response.Content != null)
                 {
-                    foreach (var user in response.Content)
+                    var items = response.Content.ToList();
+                    foreach (var user in items)
                     {
-                        Users.Add(user);
+                        if (!Users.Any(u => u.Id == user.Id))
+                        {
+                            Users.Add(user);
+                        }
                     }
-                    CanLoadMore = response.Content.Count() == PageSize;
-                    _currentPage++;
-                    _logger.LogInformation("Successfully loaded {UserCount} users", response.Content.Count());
+
+                    _totalUserCount = Users.Count;
+                    _canLoadMore = items.Count == PageSize;
+                    if (_canLoadMore) _currentPage++;
+
+                    UpdatePagingInfo();
+                    _logger.LogInformation("Loaded {Count} users. Total (estimated): {Total}. Can load more: {CanLoadMore}",
+                        items.Count, _totalUserCount, _canLoadMore);
                 }
                 else
                 {
-                    ErrorMessage = response.Error?.Content ?? "Failed to load users.";
-                    _logger.LogError("Failed to load users. Status: {StatusCode}, Error: {Error}",
-                        response.StatusCode, response.Error?.Content);
+                    var errorMessage = response.Error?.Content ?? "Failed to load users.";
+                    await DisplayAlertAsync("Error", errorMessage);
+                    ErrorMessage = errorMessage;
+                    _logger.LogWarning("Failed to load admin users. Status: {StatusCode}, Error: {Error}",
+                        response.StatusCode, errorMessage);
                 }
-            }, isRefreshing, nameof(ShowContent)); // Use isRefreshing for showBusy
+            }, propertyName: nameof(ShowContent));
         }
-
-        [RelayCommand(CanExecute = nameof(CanExecuteLoadMore))]
-        private async Task LoadMoreUsers()
-        {
-            await LoadUsers();
-        }
-
-        private bool CanExecuteLoadMore() => CanLoadMore && !IsBusy;
 
         [RelayCommand]
-        private async Task GoToUserDetails(UserDto user)
+        private async Task LoadMoreUsersAsync()
         {
-            if (user == null || user.Id == Guid.Empty) return;
+            if (_isLoadingMore || !_canLoadMore || IsBusy) return;
+            _isLoadingMore = true;
+            await LoadUsersAsync(isRefreshing: false);
+            _isLoadingMore = false;
+        }
 
-            await RunSafeAsync(async () =>
+        [RelayCommand]
+        private async Task SearchUsersAsync() => await LoadUsersAsync(true);
+
+        [RelayCommand]
+        private async Task GoToUserDetailsAsync(Guid? userId)
+        {
+            if (userId.HasValue && userId.Value != Guid.Empty)
             {
-                _logger.LogInformation("Navigating to user details for ID: {UserId}", user.Id);
-                await Shell.Current.GoToAsync($"{nameof(AdminUserDetailsPage)}?UserId={user.Id}");
-            }, showBusy: false);
+                _logger.LogInformation("Navigating to Admin User Details for UserId: {UserId}", userId.Value);
+                await Shell.Current.GoToAsync($"{nameof(AdminUserDetailsPage)}?UserId={userId.Value}");
+            }
+        }
+
+        private void UpdatePagingInfo()
+        {
+            if (Users.Any())
+            {
+                var estimatedTotalPages = (_totalUserCount + PageSize - 1) / PageSize;
+                PagingInfo = $"Page {_currentPage - 1} of {estimatedTotalPages}. Showing {Users.Count} users";
+            }
+            else
+            {
+                PagingInfo = "No users found.";
+            }
         }
 
         public async void OnAppearing()
         {
-            if (_initialLoadPending)
+            if (!_isInitialized)
             {
-                _initialLoadPending = false;
-                try
-                {
-                    await LoadUsers(false);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error during initial user load");
-                    ErrorMessage = "Failed to load users on startup.";
-                }
+                _isInitialized = true;
+                await LoadUsersAsync(true);
             }
         }
     }

@@ -8,101 +8,96 @@
              x:Class="Bookstore.Mobile.Views.AdminUserListPage"
              Title="{Binding Title}">
 
-    <Grid RowDefinitions="Auto, Auto, *">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Resources/Styles/Converters.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <x:Boolean x:Key="TrueValue">True</x:Boolean>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, Auto, Auto, *">
         <Label Grid.Row="0" Text="Manage Users" Style="{StaticResource Headline}" Margin="15,10"/>
 
-        <!-- Filters -->
-        <HorizontalStackLayout Grid.Row="1" Margin="15,0,15,10" Spacing="10" IsEnabled="{Binding IsNotBusy}">
-            <Picker Title="Filter by Role"
+        <Grid Grid.Row="1" Margin="15,0,15,10" ColumnSpacing="10" RowSpacing="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <SearchBar Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Placeholder="Search by Username, Email, Name..."
+                       Text="{Binding SearchTerm}"
+                       SearchCommand="{Binding SearchUsersCommand}"/>
+
+            <Picker Grid.Row="1" Grid.Column="0" Title="Filter by Role"
                     ItemsSource="{Binding AvailableRoles}"
-                    SelectedItem="{Binding SelectedRoleFilter}"
-                    HorizontalOptions="FillAndExpand"/>
-            <Picker Title="Filter by Status"
+                    SelectedItem="{Binding SelectedRoleFilter}"/>
+
+            <Picker Grid.Row="1" Grid.Column="1" Title="Filter by Status"
                     ItemsSource="{Binding AvailableStatuses}"
-                    SelectedItem="{Binding SelectedStatusFilter}"
-                    HorizontalOptions="FillAndExpand"/>
-            <Button Text="Clear" 
-                   Command="{Binding ClearFiltersCommand}" 
-                   FontSize="Micro" 
-                   Style="{StaticResource TextButton}" 
-                   Padding="5"
-                   IsEnabled="{Binding HasFiltersApplied}"/>
-        </HorizontalStackLayout>
+                    SelectedItem="{Binding SelectedStatusFilter}"/>
+        </Grid>
 
-        <ActivityIndicator Grid.Row="1" Grid.RowSpan="2" 
-                          IsRunning="{Binding IsBusy}" 
-                          IsVisible="{Binding IsBusy}" 
-                          VerticalOptions="Center" 
-                          HorizontalOptions="Center"/>
+        <ActivityIndicator Grid.Row="2" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" VerticalOptions="Center" HorizontalOptions="Center"/>
+        <Label Grid.Row="2" Text="{Binding ErrorMessage}" Style="{StaticResource ErrorLabel}" IsVisible="{Binding HasError}" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" Margin="15"/>
 
-        <Label Grid.Row="2" 
-              Text="{Binding ErrorMessage}" 
-              Style="{StaticResource ErrorLabel}" 
-              IsVisible="{Binding HasError}" 
-              VerticalOptions="Center" 
-              HorizontalOptions="Center"/>
-
-        <!-- User List -->
-        <RefreshView Grid.Row="2" 
-                     Command="{Binding LoadUsersCommand}" 
-                     IsRefreshing="{Binding IsRefreshing}" 
-                     IsVisible="{Binding ShowContent}">
-            <CollectionView x:Name="UserListView"
-                          ItemsSource="{Binding Users}"
-                          SelectionMode="None"
-                          Margin="10"
-                          RemainingItemsThreshold="5"
-                          RemainingItemsThresholdReachedCommand="{Binding LoadMoreUsersCommand}">
+        <RefreshView Grid.Row="3" Command="{Binding LoadUsersCommand}" CommandParameter="{StaticResource TrueValue}" IsRefreshing="{Binding IsBusy}" IsVisible="{Binding ShowContent}">
+            <CollectionView ItemsSource="{Binding Users}"
+                            SelectionMode="None"
+                            Margin="10,0,10,10"
+                            RemainingItemsThreshold="5"
+                            RemainingItemsThresholdReachedCommand="{Binding LoadMoreUsersCommand}">
                 <CollectionView.EmptyView>
-                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10">
-                        <Label Text="No users found matching criteria." 
-                               HorizontalOptions="Center" 
-                               VerticalOptions="Center" 
-                               Margin="20"/>
-                        <Button Text="Refresh" 
-                                Command="{Binding LoadUsersCommand}"
-                                Style="{StaticResource PrimaryButton}"
-                                HorizontalOptions="Center"/>
-                    </VerticalStackLayout>
+                    <StackLayout Padding="50" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image Source="empty_users.png" HeightRequest="120" WidthRequest="120" Margin="0,0,0,20"/>
+                        <Label Text="No users found" FontSize="Large" FontAttributes="Bold" HorizontalOptions="Center"/>
+                        <Label Text="Try adjusting your search or filters" FontSize="Medium" TextColor="{StaticResource Gray600Light}" HorizontalOptions="Center"/>
+                    </StackLayout>
                 </CollectionView.EmptyView>
-
+                <CollectionView.Footer>
+                    <StackLayout IsVisible="{Binding CanLoadMore}">
+                        <ActivityIndicator IsRunning="{Binding IsLoadingMore}" IsVisible="{Binding IsLoadingMore}" 
+                                         HorizontalOptions="Center" Margin="0,10"/>
+                    </StackLayout>
+                </CollectionView.Footer>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="dto:UserDto">
-                        <Border Style="{StaticResource CardBorder}" Padding="10,8" Margin="0,0,0,8">
+                        <Border Style="{StaticResource CardBorder}" Padding="10" Margin="0,0,0,8">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer 
-                                    Command="{Binding Source={x:Reference UserListView}, Path=BindingContext.GoToUserDetailsCommand}"
-                                    CommandParameter="{Binding .}"/>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminUserListViewModel}}, Path=GoToUserDetailsCommand}"
+                                                       CommandParameter="{Binding Id}"/>
                             </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10">
-                                <!-- User Info -->
-                                <Label Grid.Row="0" Grid.Column="0" 
-                                      Text="{Binding UserName}" 
-                                      FontAttributes="Bold" 
-                                      LineBreakMode="TailTruncation"/>
-                                <Label Grid.Row="1" Grid.Column="0" 
-                                      Text="{Binding Email}" 
-                                      FontSize="Small" 
-                                      LineBreakMode="TailTruncation"/>
-                                <Label Grid.Row="2" Grid.Column="0" 
-                                      Text="{Binding Roles, Converter={StaticResource ListToStringConverter}}" 
-                                      FontSize="Micro" 
-                                      TextColor="{AppThemeBinding Light={StaticResource Gray600Light}, Dark={StaticResource Gray300Dark}}" 
-                                      LineBreakMode="TailTruncation"/>
+                            <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="3">
+                                <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding UserName}"/>
+                                            <Span Text=" ("/>
+                                            <Span Text="{Binding FirstName, TargetNullValue=''}"/>
+                                            <Span Text=" "/>
+                                            <Span Text="{Binding LastName, TargetNullValue=''}"/>
+                                            <Span Text=")"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label Grid.Row="1" Grid.Column="0" Text="{Binding Email}" FontSize="Small"/>
+                                <Label Grid.Row="2" Grid.Column="0" Text="{Binding Roles, Converter={StaticResource ListToStringConverter}}" FontSize="Micro" TextColor="{StaticResource Gray600Light}"/>
 
-                                <!-- Status -->
                                 <Label Grid.Row="0" Grid.Column="1"
                                        Text="{Binding IsActive, Converter={StaticResource BoolToStatusTextConverter}}"
                                        TextColor="{Binding IsActive, Converter={StaticResource BoolToStatusColorConverter}}"
-                                       FontAttributes="Bold" 
-                                       FontSize="Small" 
-                                       HorizontalTextAlignment="End" 
-                                       VerticalOptions="Start"/>
+                                       FontAttributes="Bold" FontSize="Small" HorizontalTextAlignment="End"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </RefreshView>
+        <Label Grid.Row="3" Text="{Binding PagingInfo}" HorizontalOptions="Center" VerticalOptions="End" FontSize="Micro" Margin="0,0,0,5" IsVisible="{Binding ShowContent}"/>
     </Grid>
 </ContentPage>
