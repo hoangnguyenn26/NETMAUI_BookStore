@@ -1,6 +1,6 @@
-using Bookstore.Mobile.ViewModels.Admin.Orders;
+using Bookstore.Mobile.ViewModels;
 
-namespace Bookstore.Mobile.Views.Admin.Orders;
+namespace Bookstore.Mobile.Views;
 
 public partial class CreateInStoreOrderPage : ContentPage
 {

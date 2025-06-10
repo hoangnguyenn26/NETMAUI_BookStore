@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:Bookstore.Mobile.ViewModels.Admin.Orders"
+             xmlns:vm="clr-namespace:Bookstore.Mobile.ViewModels"
              xmlns:dto="clr-namespace:Bookstore.Mobile.Models"
-             xmlns:dto_instoreorder="clr-namespace:Bookstore.Mobile.Models.Orders"
              xmlns:enums="clr-namespace:Bookstore.Mobile.Enums"
              x:DataType="vm:CreateInStoreOrderViewModel"
-             x:Class="Bookstore.Mobile.Views.Admin.Orders.CreateInStoreOrderPage"
+             x:Class="Bookstore.Mobile.Views.CreateInStoreOrderPage"
              Title="{Binding Title}"
              BackgroundColor="{AppThemeBinding Light=#F8FAFC, Dark=#0F172A}">
 
@@ -408,7 +407,7 @@
 
                             <CollectionView ItemsSource="{Binding CurrentOrderDetails}">
                                 <CollectionView.ItemTemplate>
-                                    <DataTemplate x:DataType="dto_instoreorder:InStoreOrderDetailViewModel">
+                                    <DataTemplate x:DataType="dto:InStoreOrderDetailDto">
                                         <Border Style="{StaticResource GradientCard}" 
                                                 BackgroundColor="{AppThemeBinding Light=White, Dark=#1E293B}"
                                                 Margin="0,2,0,2">

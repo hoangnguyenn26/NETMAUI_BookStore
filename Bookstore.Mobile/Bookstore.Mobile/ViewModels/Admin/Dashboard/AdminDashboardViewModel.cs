@@ -1,6 +1,5 @@
 ﻿using Bookstore.Mobile.Interfaces.Apis;
 using Bookstore.Mobile.Models;
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -34,7 +33,7 @@ namespace Bookstore.Mobile.ViewModels
             {
                 _logger.LogInformation("Loading admin dashboard summary.");
                 // Có thể lấy ngưỡng tồn kho thấp từ Settings hoặc để mặc định
-                var response = await _dashboardApi.GetSummary(lowStockThreshold: 5);
+                var response = await _dashboardApi.GetSummary(lowStockThreshold: 10);
 
                 if (response.IsSuccessStatusCode && response.Content != null)
                 {
@@ -59,15 +58,6 @@ namespace Bookstore.Mobile.ViewModels
                 OnPropertyChanged(nameof(ShowContent));
             }
         }
-
-        // Command điều hướng (ví dụ)
-        [RelayCommand]
-        private async Task GoToLowStockReportAsync()
-        {
-            _logger.LogInformation("Navigating to Low Stock Report page.");
-            await Shell.Current.DisplaySnackbar("Navigate to Low Stock Report (To be implemented)", duration: TimeSpan.FromSeconds(2));
-        }
-
 
         public void OnAppearing()
         {

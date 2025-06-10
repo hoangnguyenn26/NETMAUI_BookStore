@@ -33,10 +33,19 @@ namespace Bookstore.Mobile.ViewModels
         protected async Task RunSafeAsync(Func<Task> action, [CallerMemberName] string? propertyName = null)
         {
             if (IsBusy) return;
+
             IsBusy = true;
             ErrorMessage = null;
-            try { await action(); }
-            catch (Exception ex) { ErrorMessage = ex.Message; }
+
+            try
+            {
+                await action();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+                await DisplayAlertAsync("Error", ex.Message);
+            }
             finally
             {
                 IsBusy = false;
@@ -52,7 +61,9 @@ namespace Bookstore.Mobile.ViewModels
             {
                 IsBusy = true;
             }
+
             ErrorMessage = null;
+
             try
             {
                 await action();
@@ -60,6 +71,7 @@ namespace Bookstore.Mobile.ViewModels
             catch (Exception ex)
             {
                 ErrorMessage = ex.Message;
+                await DisplayAlertAsync("Error", ex.Message);
             }
             finally
             {

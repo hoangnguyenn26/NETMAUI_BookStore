@@ -4,8 +4,6 @@
        xmlns:local="clr-namespace:Bookstore.Mobile"
        xmlns:views="clr-namespace:Bookstore.Mobile.Views"
        xmlns:vm="clr-namespace:Bookstore.Mobile.ViewModels"
-       xmlns:admininv="clr-namespace:Bookstore.Mobile.Views.Admin.Inventory"
-       xmlns:admincreatorder="clr-namespace:Bookstore.Mobile.Views.Admin.Orders"
        x:DataType="vm:AppShellViewModel"
        x:Class="Bookstore.Mobile.AppShell"
        Shell.FlyoutBehavior="Flyout">
@@ -77,7 +75,7 @@
                       Route="AdminSupplierListPage"/>
         <ShellContent Title="Create Order"
                       Icon="shopping_cart.png"
-                      ContentTemplate="{DataTemplate admincreatorder:CreateInStoreOrderPage}"
+                      ContentTemplate="{DataTemplate views:CreateInStoreOrderPage}"
                       Route="CreateInStoreOrderPage"/>  
     </FlyoutItem>
 
@@ -97,7 +95,7 @@
                       Route="AdminReportsPage" />
         <ShellContent Title="InventoryHistory"
                       Icon="history.png"
-                        ContentTemplate="{DataTemplate admininv:InventoryHistoryPage}"
+                        ContentTemplate="{DataTemplate views:InventoryHistoryPage}"
                       Route="InventoryHistoryPage" />
     </FlyoutItem>
 
@@ -132,7 +130,7 @@
     <ShellContent ContentTemplate="{DataTemplate views:CreateStockReceiptPage}" Route="CreateStockReceiptPage" Shell.FlyoutItemIsVisible="False"/>
     <ShellContent ContentTemplate="{DataTemplate views:InventoryAdjustmentPage}" Route="InventoryAdjustmentPage" Shell.FlyoutItemIsVisible="False"/>
     <ShellContent ContentTemplate="{DataTemplate views:AdminReportsPage}" Route="AdminReportsPage" Shell.FlyoutItemIsVisible="False"/>
-    <ShellContent ContentTemplate="{DataTemplate admincreatorder:CreateInStoreOrderPage}" Route="CreateInStoreOrderPage" Shell.FlyoutItemIsVisible="False"/>
+    <ShellContent ContentTemplate="{DataTemplate views:CreateInStoreOrderPage}" Route="CreateInStoreOrderPage" Shell.FlyoutItemIsVisible="False"/>
     
     <ShellContent ContentTemplate="{DataTemplate views:LoginPage}" Route="LoginPage" Shell.FlyoutItemIsVisible="False" Shell.NavBarIsVisible="False"/>
     <ShellContent ContentTemplate="{DataTemplate views:AddEditPromotionPage}" Route="AddEditPromotionPage" Shell.FlyoutItemIsVisible="False"/>

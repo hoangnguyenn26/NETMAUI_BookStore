@@ -10,7 +10,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 
-namespace Bookstore.Mobile.ViewModels.Admin.Orders
+namespace Bookstore.Mobile.ViewModels
 {
     public partial class CreateInStoreOrderViewModel : BaseViewModel
     {

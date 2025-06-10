@@ -1,6 +1,6 @@
-using Bookstore.Mobile.ViewModels.Admin.Inventory;
+using Bookstore.Mobile.ViewModels;
 
-namespace Bookstore.Mobile.Views.Admin.Inventory;
+namespace Bookstore.Mobile.Views;
 
 public partial class InventoryHistoryPage : ContentPage
 {

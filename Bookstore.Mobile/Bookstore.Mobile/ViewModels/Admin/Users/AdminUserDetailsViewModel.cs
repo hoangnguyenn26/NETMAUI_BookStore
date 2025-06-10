@@ -17,8 +17,8 @@ namespace Bookstore.Mobile.ViewModels
 
         public AdminUserDetailsViewModel(IAdminUserApi userApi, ILogger<AdminUserDetailsViewModel> logger)
         {
-            _userApi = userApi;
-            _logger = logger;
+            _userApi = userApi ?? throw new ArgumentNullException(nameof(userApi));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Title = "User Details";
         }
 
@@ -51,17 +51,38 @@ namespace Bookstore.Mobile.ViewModels
 
         private async void ProcessUserId(string? idString)
         {
-            IsBusy = true; ErrorMessage = null; UserDetails = null;
-            if (Guid.TryParse(idString, out Guid parsedId) && parsedId != Guid.Empty)
+            IsBusy = true;
+            ErrorMessage = null;
+            UserDetails = null;
+
+            try
             {
+                if (string.IsNullOrEmpty(idString))
+                {
+                    ErrorMessage = "User ID is required.";
+                    return;
+                }
+
+                if (!Guid.TryParse(idString, out Guid parsedId) || parsedId == Guid.Empty)
+                {
+                    ErrorMessage = "Invalid User ID.";
+                    return;
+                }
+
                 _actualUserId = parsedId;
+                _logger.LogInformation("Processing User ID: {UserId}", _actualUserId);
                 await LoadUserDetailsAsync();
             }
-            else
+            catch (Exception ex)
             {
-                _actualUserId = Guid.Empty; ErrorMessage = "Invalid User ID."; IsBusy = false;
+                _logger.LogError(ex, "Error processing User ID: {UserId}", idString);
+                ErrorMessage = "An error occurred while processing the User ID.";
             }
-            OnPropertyChanged(nameof(ShowContent));
+            finally
+            {
+                IsBusy = false;
+                OnPropertyChanged(nameof(ShowContent));
+            }
         }
 
         [RelayCommand]
@@ -69,18 +90,29 @@ namespace Bookstore.Mobile.ViewModels
         {
             await RunSafeAsync(async () =>
             {
-                if (_actualUserId == Guid.Empty) return;
+                if (_actualUserId == Guid.Empty)
+                {
+                    ErrorMessage = "Invalid User ID.";
+                    return;
+                }
+
+                _logger.LogInformation("Loading details for user {UserId}", _actualUserId);
                 var response = await _userApi.GetUserById(_actualUserId);
+
                 if (response.IsSuccessStatusCode && response.Content != null)
                 {
                     UserDetails = response.Content;
                     IsUserActive = UserDetails.IsActive;
+                    _logger.LogInformation("Successfully loaded user details for {UserId}", _actualUserId);
                 }
                 else
                 {
-                    ErrorMessage = response.Error?.Content ?? "Failed to load user details.";
+                    var errorMessage = response.Error?.Content ?? "Failed to load user details.";
+                    ErrorMessage = errorMessage;
+                    _logger.LogWarning("Failed to load user details. Status: {StatusCode}, Error: {Error}", 
+                        response.StatusCode, errorMessage);
                 }
-            }, nameof(ShowContent));
+            }, propertyName: nameof(ShowContent));
         }
 
         [RelayCommand(CanExecute = nameof(CanUpdateStatus))]
@@ -88,9 +120,10 @@ namespace Bookstore.Mobile.ViewModels
         {
             if (UserDetails == null || _actualUserId == Guid.Empty) return;
 
-            IsUpdatingStatus = true; IsBusy = true;
+            IsUpdatingStatus = true;
             UpdateStatusMessage = null;
-            _logger.LogInformation("Admin attempting to update status for user {UserId} to IsActive={IsActive}", _actualUserId, IsUserActive);
+            _logger.LogInformation("Admin attempting to update status for user {UserId} to IsActive={IsActive}", 
+                _actualUserId, IsUserActive);
 
             try
             {
@@ -99,7 +132,8 @@ namespace Bookstore.Mobile.ViewModels
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("User {UserId} status updated successfully to {IsActive}", _actualUserId, IsUserActive);
+                    _logger.LogInformation("User {UserId} status updated successfully to {IsActive}", 
+                        _actualUserId, IsUserActive);
                     UpdateStatusMessage = "Status Updated Successfully!";
                     UpdateStatusColor = Colors.Green;
                     UserDetails.IsActive = IsUserActive;
@@ -110,8 +144,8 @@ namespace Bookstore.Mobile.ViewModels
                     string errorContent = response.Error?.Content ?? "Failed to update status.";
                     UpdateStatusMessage = $"Error: {errorContent}";
                     UpdateStatusColor = Colors.Red;
-                    _logger.LogWarning("Failed to update status for user {UserId}. Status: {StatusCode}", _actualUserId, response.StatusCode);
-                    // Reset lại Switch về trạng thái cũ
+                    _logger.LogWarning("Failed to update status for user {UserId}. Status: {StatusCode}", 
+                        _actualUserId, response.StatusCode);
                     IsUserActive = UserDetails.IsActive;
                 }
             }
@@ -124,7 +158,7 @@ namespace Bookstore.Mobile.ViewModels
             }
             finally
             {
-                IsUpdatingStatus = false; IsBusy = false;
+                IsUpdatingStatus = false;
                 OnPropertyChanged(nameof(ShowUpdateStatusMessage));
                 UpdateStatusCommand.NotifyCanExecuteChanged();
             }
@@ -138,7 +172,6 @@ namespace Bookstore.Mobile.ViewModels
             }
             else if (UserDetails != null)
             {
-                // Reset thông báo khi quay lại trang
                 UpdateStatusMessage = null;
                 OnPropertyChanged(nameof(ShowUpdateStatusMessage));
                 IsUserActive = UserDetails.IsActive;
