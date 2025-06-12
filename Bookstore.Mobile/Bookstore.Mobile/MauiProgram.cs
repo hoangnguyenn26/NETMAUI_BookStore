@@ -7,12 +7,34 @@ using Bookstore.Mobile.ViewModels;
 using CommunityToolkit.Maui;
 using FluentValidation;
 using Microcharts.Maui;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Refit;
 using System.Text.Json;
 
 namespace Bookstore.Mobile
 {
+    public class ApiConfiguration
+    {
+        public string BaseAddress { get; }
+        public string HttpBaseAddress { get; }
+
+        public ApiConfiguration(IConfiguration configuration)
+        {
+            BaseAddress = configuration["ApiSettings:BaseAddress"] ?? "https://localhost:7264/api";
+            HttpBaseAddress = configuration["ApiSettings:HttpBaseAddress"] ?? "http://localhost:5244/api";
+        }
+
+        public string GetBaseAddressForPlatform(bool isAndroidDebug)
+        {
+            if (isAndroidDebug)
+            {
+                return HttpBaseAddress.Replace("http://localhost", "http://10.0.2.2");
+            }
+            return BaseAddress;
+        }
+    }
+
     public static class MauiProgram
     {
         public static MauiApp CreateMauiApp()
@@ -31,52 +53,100 @@ namespace Bookstore.Mobile
                     fonts.AddFont("Inter-Regular.otf", "InterRegular");
                 });
 
-            // ----- Đăng ký Dependency Injection -----
+            // Configure logging
+            ConfigureLogging(builder);
 
-            // Logging
-#if DEBUG
-            builder.Logging.AddDebug();
-#endif
-            var logger = builder.Services.BuildServiceProvider().GetService<ILogger<MauiApp>>();
+            // Configure API clients
+            ConfigureApiClients(builder);
 
-            // Lấy địa chỉ API gốc (ưu tiên HTTPS)
-            string apiBaseAddress = builder.Configuration["ApiSettings:BaseAddress"] ?? "https://localhost:7264/api";
-            string httpApiBaseAddress = builder.Configuration["ApiSettings:HttpBaseAddress"] ?? "http://localhost:5244/api";
-
-            // --- XỬ LÝ KẾT NỐI CHO ANDROID DEBUG ---
-#if DEBUG && ANDROID 
-            // Emulator dùng 10.0.2.2 để trỏ về localhost của máy host
-            // và phải dùng HTTP nếu không cấu hình HTTPS phức tạp
-            logger?.LogWarning("Android DEBUG detected. Using HTTP address for API connection.");
-            apiBaseAddress = httpApiBaseAddress.Replace("http://localhost", "http://10.0.2.2");
-            logger?.LogInformation("API Base Address set to: {ApiBaseAddress}", apiBaseAddress);
-
-            // Đăng ký Refit clients với địa chỉ HTTP đã sửa đổi
-            ConfigureDefaultRefitClients(builder.Services, apiBaseAddress);
-
-#else
-            // Cấu hình cho các platform khác hoặc Release build (dùng HTTPS mặc định)
-            logger?.LogInformation("Using default HTTPS address for API connection: {ApiBaseAddress}", apiBaseAddress);
-            ConfigureDefaultRefitClients(builder.Services, apiBaseAddress);
-#endif
-
-            // Singleton Services
-            builder.Services.AddSingleton<IAuthService, AuthService>();
-            builder.Services.AddSingleton<AppShellViewModel>();
-            builder.Services.AddSingleton<AppShell>();
-
-            // Đăng ký Handler là Transient
-            builder.Services.AddTransient<AuthHeaderHandler>();
-            //Đăng ký Validators
-            builder.Services.AddValidatorsFromAssemblyContaining<LoginViewModelValidator>();
-
-            // ----- Auto-register ViewModels & Views (Transient) -----
-            RegisterViewModelsAndViews(builder.Services);
+            // Register services
+            RegisterServices(builder.Services);
 
             return builder.Build();
         }
 
-        // Auto-register all ViewModels and Views as transient
+        private static void ConfigureLogging(MauiAppBuilder builder)
+        {
+#if DEBUG
+            builder.Logging.AddDebug();
+#endif
+        }
+
+        private static void ConfigureApiClients(MauiAppBuilder builder)
+        {
+            var logger = builder.Services.BuildServiceProvider().GetService<ILogger<MauiApp>>();
+            var apiConfig = new ApiConfiguration(builder.Configuration);
+
+#if DEBUG && ANDROID
+            logger?.LogWarning("Android DEBUG detected. Using HTTP address for API connection.");
+            var apiBaseAddress = apiConfig.GetBaseAddressForPlatform(true);
+            logger?.LogInformation("API Base Address set to: {ApiBaseAddress}", apiBaseAddress);
+#else
+            var apiBaseAddress = apiConfig.GetBaseAddressForPlatform(false);
+            logger?.LogInformation("Using default HTTPS address for API connection: {ApiBaseAddress}", apiBaseAddress);
+#endif
+
+            ConfigureRefitClients(builder.Services, apiBaseAddress);
+        }
+
+        private static void RegisterServices(IServiceCollection services)
+        {
+            // Singleton Services
+            services.AddSingleton<IAuthService, AuthService>();
+            services.AddSingleton<AppShellViewModel>();
+            services.AddSingleton<AppShell>();
+
+            // Transient Services
+            services.AddTransient<AuthHeaderHandler>();
+            services.AddValidatorsFromAssemblyContaining<LoginViewModelValidator>();
+
+            // Auto-register ViewModels & Views
+            RegisterViewModelsAndViews(services);
+        }
+
+        private static void ConfigureRefitClients(IServiceCollection services, string apiBaseAddress)
+        {
+            var refitSettings = new RefitSettings(new SystemTextJsonContentSerializer(new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            }));
+            var baseUri = new Uri(apiBaseAddress);
+
+            // Group API clients by authentication requirements
+            var noAuthApis = new[] { typeof(IAuthApi), typeof(IDashboardApi) };
+            var optionalAuthApis = new[] { typeof(IBooksApi), typeof(ICategoriesApi), typeof(IReviewApi) };
+            var requiredAuthApis = new[]
+            {
+                typeof(IWishlistApi), typeof(ICartApi), typeof(IAddressApi), typeof(IOrderApi),
+                typeof(IAdminDashboardApi), typeof(IAuthorApi), typeof(IAdminReportApi),
+                typeof(ISupplierApi), typeof(IStockReceiptApi), typeof(IInventoryApi),
+                typeof(IAdminPromotionApi), typeof(IAdminUserApi)
+            };
+
+            // Register APIs without auth
+            foreach (var apiType in noAuthApis)
+            {
+                services.AddRefitClient(apiType, refitSettings)
+                        .ConfigureHttpClient(c => c.BaseAddress = baseUri);
+            }
+
+            // Register APIs with optional auth
+            foreach (var apiType in optionalAuthApis)
+            {
+                services.AddRefitClient(apiType, refitSettings)
+                        .ConfigureHttpClient(c => c.BaseAddress = baseUri)
+                        .AddHttpMessageHandler<AuthHeaderHandler>();
+            }
+
+            // Register APIs requiring auth
+            foreach (var apiType in requiredAuthApis)
+            {
+                services.AddRefitClient(apiType, refitSettings)
+                        .ConfigureHttpClient(c => c.BaseAddress = baseUri)
+                        .AddHttpMessageHandler<AuthHeaderHandler>();
+            }
+        }
+
         private static void RegisterViewModelsAndViews(IServiceCollection services)
         {
             var assembly = typeof(MauiProgram).Assembly;
@@ -94,87 +164,5 @@ namespace Bookstore.Mobile
                 services.AddTransient(type);
             }
         }
-
-        // Helper đăng ký Refit client
-        private static void ConfigureDefaultRefitClients(IServiceCollection services, string apiBaseAddress)
-        {
-            var refitSettings = new RefitSettings(new SystemTextJsonContentSerializer(new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            }));
-            var baseUri = new Uri(apiBaseAddress);
-
-            // --- Client KHÔNG cần Auth Header ---
-            services.AddRefitClient<IAuthApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri);
-
-            // --- Clients CÓ THỂ cần hoặc KHÔNG cần Auth Header (gắn sẵn handler cho an toàn) ---
-            // Public endpoints (GetBooks, GetCategories) sẽ không bị ảnh hưởng nếu không có token
-            services.AddRefitClient<IBooksApi>(refitSettings)
-                   .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                   .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<ICategoriesApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<IDashboardApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri);
-
-            services.AddRefitClient<IReviewApi>(refitSettings)
-                   .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                   .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            // --- Clients CHẮC CHẮN cần Auth Header ---
-            services.AddRefitClient<IWishlistApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<ICartApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<IAddressApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<IOrderApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            // --- Clients cho Admin/Staff (Luôn cần Auth Header) ---
-            services.AddRefitClient<IAdminDashboardApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<IAuthorApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<IAdminReportApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<ISupplierApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<IStockReceiptApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<IInventoryApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseAddress))
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<IAdminPromotionApi>(refitSettings)
-                    .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                    .AddHttpMessageHandler<AuthHeaderHandler>();
-
-            services.AddRefitClient<IAdminUserApi>(refitSettings)
-                   .ConfigureHttpClient(c => c.BaseAddress = baseUri)
-                   .AddHttpMessageHandler<AuthHeaderHandler>();
-        }
     }
-
 }
