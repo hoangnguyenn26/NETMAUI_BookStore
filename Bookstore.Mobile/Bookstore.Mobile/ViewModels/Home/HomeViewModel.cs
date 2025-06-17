@@ -106,11 +106,14 @@ namespace Bookstore.Mobile.ViewModels
         public void OnAppearing()
         {
             UpdateWelcomeMessage();
-            // Chỉ tải dữ liệu nếu chưa có hoặc cần làm mới
-            if (DashboardData.NewestBooks.Count == 0)
-            {
-                LoadDashboardCommand.Execute(null);
-            }
+            // Always load data when page appears
+            LoadDashboardCommand.Execute(null);
+        }
+
+        public override async Task OnNavigatedTo()
+        {
+            await base.OnNavigatedTo();
+            OnAppearing();
         }
     }
 }
