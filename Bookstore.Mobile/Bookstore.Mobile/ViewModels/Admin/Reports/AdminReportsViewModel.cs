@@ -1,5 +1,4 @@
-﻿
-using Bookstore.Mobile.Interfaces.Apis;
+﻿using Bookstore.Mobile.Interfaces.Apis;
 using Bookstore.Mobile.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -42,12 +41,14 @@ namespace Bookstore.Mobile.ViewModels
         [ObservableProperty] private bool _showLowStockReport = false;
         [ObservableProperty] private int _lowStockThreshold = 5;
 
-        // ErrorMessage đã có trong BaseViewModel
-
         [RelayCommand]
-        private async Task LoadAllReportsAsync(bool isRefreshing = false)
+        private async Task LoadAllReportsAsync()
         {
-            // *** SỬA Ở ĐÂY: Xóa tham số errorMessage ***
+            await LoadAllReportsInternalAsync(false);
+        }
+
+        private async Task LoadAllReportsInternalAsync(bool isRefreshing = false)
+        {
             await RunSafeAsync(async () =>
             {
                 if (isRefreshing)
@@ -71,7 +72,6 @@ namespace Bookstore.Mobile.ViewModels
 
                 await Task.WhenAll(revenueTask, bestsellersTask, lowStockTask);
 
-                // Kiểm tra lại xem có lỗi nào được ghi nhận bởi các task con không
                 if (HasError)
                 {
                     _logger.LogWarning("One or more reports failed to load. The error message is displayed.");
@@ -92,19 +92,26 @@ namespace Bookstore.Mobile.ViewModels
                         RevenueReport = response.Content;
                         CreateRevenueChart();
                         ShowRevenueReport = true;
+                        ErrorMessage = null;
                     });
                 }
                 else
                 {
                     var error = response.Error?.Content ?? "Revenue report failed";
                     _logger.LogWarning("Revenue report failed: {Error}", error);
-                    // Không throw lỗi để các task khác tiếp tục
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        ErrorMessage = error;
+                    });
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Exception loading revenue report.");
-                // Không throw lỗi
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ErrorMessage = ex.Message;
+                });
             }
         }
 
@@ -147,16 +154,26 @@ namespace Bookstore.Mobile.ViewModels
                         BestsellersData = response.Content.ToList();
                         CreateBestsellersChart();
                         ShowBestsellersReport = BestsellersData.Any();
+                        ErrorMessage = null;
                     });
                 }
                 else
                 {
-                    _logger.LogWarning("Failed to load bestsellers. Status: {StatusCode}", response.StatusCode);
+                    var error = $"Failed to load bestsellers. Status: {response.StatusCode}";
+                    _logger.LogWarning(error);
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        ErrorMessage = error;
+                    });
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Exception loading bestsellers report.");
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ErrorMessage = ex.Message;
+                });
             }
         }
 
@@ -194,10 +211,13 @@ namespace Bookstore.Mobile.ViewModels
                     if (response.IsSuccessStatusCode && response.Content != null)
                     {
                         foreach (var book in response.Content) LowStockBooks.Add(book);
+                        ErrorMessage = null;
                     }
                     else
                     {
-                        _logger.LogWarning("Failed to load low stock report. Status: {StatusCode}", response.StatusCode);
+                        var error = $"Failed to load low stock report. Status: {response.StatusCode}";
+                        _logger.LogWarning(error);
+                        ErrorMessage = error;
                     }
                     ShowLowStockReport = true;
                 });
@@ -205,19 +225,22 @@ namespace Bookstore.Mobile.ViewModels
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Exception loading low stock report.");
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ErrorMessage = ex.Message;
+                });
             }
         }
 
         [RelayCommand]
         private async Task RefreshAllReports()
         {
-            await LoadAllReportsAsync(true);
+            await LoadAllReportsInternalAsync(true);
         }
 
         [RelayCommand]
         private async Task ReloadLowStock()
         {
-            // *** SỬA Ở ĐÂY: Xóa tham số errorMessage ***
             await RunSafeAsync(LoadLowStockReportInternalAsync, null);
         }
 
@@ -225,7 +248,7 @@ namespace Bookstore.Mobile.ViewModels
         {
             if (!ShowRevenueReport)
             {
-                LoadAllReportsCommand.Execute(false);
+                LoadAllReportsCommand.Execute(null);
             }
         }
 
@@ -233,7 +256,6 @@ namespace Bookstore.Mobile.ViewModels
         {
             var placeholderEntry = new List<ChartEntry>
     {
-        // Thêm một entry với giá trị 0.001f để thư viện có MaxValue > MinValue
         new ChartEntry(0.001f) { Label = "No Data", ValueLabel = " ", Color = SKColors.LightGray }
     };
 

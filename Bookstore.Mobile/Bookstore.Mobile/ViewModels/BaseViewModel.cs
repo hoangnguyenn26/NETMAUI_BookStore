@@ -83,9 +83,5 @@ namespace Bookstore.Mobile.ViewModels
                 if (propertyName != null) OnPropertyChanged(propertyName);
             }
         }
-
-        // (Optional) Hàm điều hướng chung (sẽ cần inject INavigationService sau)
-        // protected readonly INavigationService _navigationService;
-        // public BaseViewModel(INavigationService navigationService) { _navigationService = navigationService; }
     }
 }

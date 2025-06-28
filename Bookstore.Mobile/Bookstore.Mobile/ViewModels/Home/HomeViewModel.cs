@@ -109,11 +109,5 @@ namespace Bookstore.Mobile.ViewModels
             // Always load data when page appears
             LoadDashboardCommand.Execute(null);
         }
-
-        public override async Task OnNavigatedTo()
-        {
-            await base.OnNavigatedTo();
-            OnAppearing();
-        }
     }
 }

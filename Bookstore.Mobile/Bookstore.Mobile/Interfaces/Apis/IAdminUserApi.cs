@@ -7,7 +7,7 @@ namespace Bookstore.Mobile.Interfaces.Apis
     public interface IAdminUserApi
     {
         [Get("/admin/users")]
-        Task<ApiResponse<IEnumerable<UserDto>>> GetUsers(
+        Task<ApiResponse<PagedResult<UserDto>>> GetUsers(
             [Query] int page = 1,
             [Query] int pageSize = 15,
             [Query] string? role = null,

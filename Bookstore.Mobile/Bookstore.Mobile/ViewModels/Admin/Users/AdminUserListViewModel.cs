@@ -89,11 +89,30 @@ namespace Bookstore.Mobile.ViewModels
                 _logger.LogInformation("Loading admin users. Role: {Role}, Status: {Status}, Search: {Search}, Page: {Page}",
                     roleFilterParam ?? "All", statusFilterParam?.ToString() ?? "All", SearchTerm ?? "None", _currentPage);
 
-                var response = await _userApi.GetUsers(_currentPage, PageSize, roleFilterParam, statusFilterParam, SearchTerm);
+                // Add detailed parameter logging
+                _logger.LogInformation("API Call Parameters - Page: {Page}, PageSize: {PageSize}, Role: '{Role}', IsActive: {IsActive}, Search: '{Search}'",
+                    _currentPage, PageSize, roleFilterParam ?? "NULL", statusFilterParam?.ToString() ?? "NULL", SearchTerm ?? "NULL");
+
+                try
+                {
+                    var response = await _userApi.GetUsers(_currentPage, PageSize, roleFilterParam, statusFilterParam, SearchTerm);
+
+                // Enhanced logging for debugging
+                _logger.LogInformation("Response Status: {StatusCode}, IsSuccess: {IsSuccess}", 
+                    response.StatusCode, response.IsSuccessStatusCode);
+                _logger.LogInformation("Response Content is null: {IsNull}", response.Content == null);
+                _logger.LogInformation("Response Error: {Error}", response.Error?.Content ?? "No error");
+                
+                if (response.Content != null)
+                {
+                    _logger.LogInformation("Response Items Count: {Count}, Total Count: {Total}", 
+                        response.Content.Items?.Count ?? -1, response.Content.TotalCount);
+                }
 
                 if (response.IsSuccessStatusCode && response.Content != null)
                 {
-                    var items = response.Content.ToList();
+                    var pagedResult = response.Content;
+                    var items = pagedResult.Items;
                     foreach (var user in items)
                     {
                         if (!Users.Any(u => u.Id == user.Id))
@@ -102,21 +121,62 @@ namespace Bookstore.Mobile.ViewModels
                         }
                     }
 
-                    _totalUserCount = Users.Count;
-                    _canLoadMore = items.Count == PageSize;
-                    if (_canLoadMore) _currentPage++;
+                    _totalUserCount = pagedResult.TotalCount;
+                    _canLoadMore = Users.Count < _totalUserCount;
 
                     UpdatePagingInfo();
-                    _logger.LogInformation("Loaded {Count} users. Total (estimated): {Total}. Can load more: {CanLoadMore}",
+                    _logger.LogInformation("Loaded {Count} users. Total: {Total}. Can load more: {CanLoadMore}",
                         items.Count, _totalUserCount, _canLoadMore);
                 }
                 else
                 {
                     var errorMessage = response.Error?.Content ?? "Failed to load users.";
+                    
+                    // If this is the initial load (page 1, no filters) and it fails, try with a workaround
+                    if (_currentPage == 1 && roleFilterParam == null && statusFilterParam == null && string.IsNullOrEmpty(SearchTerm))
+                    {
+                        _logger.LogInformation("Initial load failed, attempting workaround by temporarily setting role filter");
+                        
+                        // Try loading with "User" role filter as workaround, then reset to "All"
+                        var workaroundResponse = await _userApi.GetUsers(_currentPage, PageSize, "User", statusFilterParam, SearchTerm);
+                        if (workaroundResponse.IsSuccessStatusCode && workaroundResponse.Content != null)
+                        {
+                            _logger.LogInformation("Workaround successful, now loading all users");
+                            // Reset and load all users
+                            await Task.Delay(500);
+                            var allUsersResponse = await _userApi.GetUsers(_currentPage, PageSize, null, null, null);
+                            if (allUsersResponse.IsSuccessStatusCode && allUsersResponse.Content != null)
+                            {
+                                var pagedResult = allUsersResponse.Content;
+                                var items = pagedResult.Items;
+                                foreach (var user in items)
+                                {
+                                    if (!Users.Any(u => u.Id == user.Id))
+                                    {
+                                        Users.Add(user);
+                                    }
+                                }
+
+                                _totalUserCount = pagedResult.TotalCount;
+                                _canLoadMore = Users.Count < _totalUserCount;
+                                UpdatePagingInfo();
+                                _logger.LogInformation("Workaround completed successfully. Loaded {Count} users.", items.Count);
+                                return; // Success, exit method
+                            }
+                        }
+                    }
+                    
                     await DisplayAlertAsync("Error", errorMessage);
                     ErrorMessage = errorMessage;
                     _logger.LogWarning("Failed to load admin users. Status: {StatusCode}, Error: {Error}",
                         response.StatusCode, errorMessage);
+                }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception while loading admin users");
+                    await DisplayAlertAsync("Error", "Failed to load users due to technical error.");
+                    ErrorMessage = "Technical error occurred.";
                 }
             }, propertyName: nameof(ShowContent));
         }
@@ -126,6 +186,7 @@ namespace Bookstore.Mobile.ViewModels
         {
             if (_isLoadingMore || !_canLoadMore || IsBusy) return;
             _isLoadingMore = true;
+            _currentPage++; // Increment page before loading more
             await LoadUsersAsync(isRefreshing: false);
             _isLoadingMore = false;
         }
@@ -148,7 +209,7 @@ namespace Bookstore.Mobile.ViewModels
             if (Users.Any())
             {
                 var estimatedTotalPages = (_totalUserCount + PageSize - 1) / PageSize;
-                PagingInfo = $"Page {_currentPage - 1} of {estimatedTotalPages}. Showing {Users.Count} users";
+                PagingInfo = $"Page {_currentPage} of {estimatedTotalPages}. Showing {Users.Count} of {_totalUserCount} users";
             }
             else
             {
@@ -161,6 +222,8 @@ namespace Bookstore.Mobile.ViewModels
             if (!_isInitialized)
             {
                 _isInitialized = true;
+                // Add small delay to ensure proper initialization
+                await Task.Delay(100);
                 await LoadUsersAsync(true);
             }
         }

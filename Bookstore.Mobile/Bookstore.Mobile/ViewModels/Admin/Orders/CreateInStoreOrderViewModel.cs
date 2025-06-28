@@ -92,7 +92,7 @@ namespace Bookstore.Mobile.ViewModels
                 if (response.IsSuccessStatusCode && response.Content != null)
                 {
                     CustomerSearchResults.Clear();
-                    foreach (var user in response.Content)
+                    foreach (var user in response.Content.Items)
                     {
                         CustomerSearchResults.Add(user);
                     }

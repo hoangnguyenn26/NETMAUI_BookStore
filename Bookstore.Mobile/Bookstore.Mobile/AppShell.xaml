@@ -70,7 +70,7 @@
               ContentTemplate="{DataTemplate views:InventoryAdjustmentPage}"
               Route="InventoryAdjustmentPage"/>
         <ShellContent Title="Suppliers"
-                      Icon="local_shipping.png"
+                      Icon="supplier.png"
                       ContentTemplate="{DataTemplate views:AdminSupplierListPage}"
                       Route="AdminSupplierListPage"/>
         <ShellContent Title="Create Order"
