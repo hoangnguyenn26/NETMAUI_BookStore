@@ -17,11 +17,6 @@ Giao diện Hiện đại, Thân thiện cho Hệ thống Quản lý Nhà sách
 - [Kiến trúc Client (MAUI)](#kiến-trúc-client-maui)
 - [Công nghệ Sử dụng (Client)](#công-nghệ-sử-dụng-client)
 - [Ảnh chụp Màn hình (Screenshots)](#ảnh-chụp-màn-hình-screenshots)
-- [Bắt đầu](#bắt-đầu)
-  - [Điều kiện Tiên quyết](#điều-kiện-tiên-quyết)
-  - [Cài đặt & Thiết lập](#cài-đặt--thiết-lập)
-  - [Chạy Ứng dụng](#chạy-ứng-dụng)
-  - [Cấu hình](#cấu-hình)
 - [Đóng góp](#đóng-góp)
 - [License](#license)
 
@@ -85,74 +80,12 @@ Giao diện Hiện đại, Thân thiện cho Hệ thống Quản lý Nhà sách
 -   **Logging:** `Microsoft.Extensions.Logging`
 
 ## **Ảnh chụp Màn hình (Screenshots)**
-
-
-
-## **Bắt đầu**
-
-### **Điều kiện Tiên quyết**
-
--   **Cài đặt .NET MAUI Workload:** Đảm bảo bạn đã cài đặt .NET SDK (phiên bản tương ứng với project) và MAUI workload. Xem hướng dẫn tại [Microsoft Docs](https://learn.microsoft.com/en-us/dotnet/maui/get-started/installation).
--   **Visual Studio 2022 (phiên bản 17.3 trở lên, khuyến nghị bản mới nhất)** với workload ".NET Multi-platform App UI development" được cài đặt.
--   **(Quan trọng) API Backend đang chạy:** Ứng dụng MAUI này cần kết nối đến `BookStoreManagement-API` đã được triển khai và đang chạy (trên localhost hoặc một server).
--   **Emulator/Thiết bị:**
-    *   Android Emulator (cấu hình trong Android Device Manager của Visual Studio).
-    *   iOS Simulator (yêu cầu máy Mac để build và chạy, hoặc dùng Pair to Mac/Dev Tunnels).
-    *   Windows (Chạy trực tiếp).
-
-### **Cài đặt & Thiết lập**
-
-1.  **Clone Repository:**
-    ```bash
-    https://github.com/hoangnguyenn26/BookStoreMobile
-    cd Bookstore.Mobile
-    ```
-
-2.  **Cấu hình Địa chỉ API Backend:**
-    *   Mở file `MauiProgram.cs` trong project `Bookstore.Mobile`.
-    *   Tìm đến dòng định nghĩa `apiBaseAddress`:
-        ```csharp
-        string apiBaseAddress = builder.Configuration["ApiSettings:BaseAddress"] ?? "https://localhost:7264/api";
-        ```
-
-3.  **Restore Dependencies (Nếu cần):**
-    Visual Studio thường tự động restore, nhưng bạn có thể click chuột phải vào Solution -> `Restore NuGet Packages`.
-
-### **Chạy Ứng dụng**
-
-1.  Mở file `Bookstore.Mobile.sln` (hoặc tên solution của bạn) bằng Visual Studio 2022.
-2.  **Chọn Target Framework và Thiết bị:**
-    *   Trên thanh công cụ, chọn Target Framework (ví dụ: `net8.0-android`, `net8.0-ios`, `net8.0-windows`).
-    *   Chọn thiết bị (Emulator Android, Simulator iOS, Local Machine cho Windows).
-3.  **Đảm bảo API Backend đang chạy.**
-4.  Nhấn `F5` hoặc nút Start Debugging (nút Play màu xanh).
-5.  Ứng dụng sẽ được build và triển khai lên thiết bị/emulator đã chọn.
-
-### **Cấu hình**
-
--   **Địa chỉ API:** Cấu hình chính nằm ở `MauiProgram.cs`. Bạn có thể đưa vào file `appsettings.json` của MAUI project nếu muốn quản lý tập trung hơn:
-    *   Tạo file `appsettings.json` trong project MAUI, đặt Build Action là `MauiAsset`.
-        ```json
-        {
-          "ApiSettings": {
-            "BaseAddress": "https://localhost:7264/api"
-          }
-        }
-        ```
-    *   Nạp cấu hình trong `MauiProgram.cs`:
-        ```csharp
-        using System.Reflection;
-        // ...
-        var assembly = Assembly.GetExecutingAssembly();
-        // Đảm bảo tên file appsettings.json khớp với tên trong GetManifestResourceStream
-        // Ví dụ: nếu namespace gốc là Bookstore.Mobile thì tên resource sẽ là Bookstore.Mobile.appsettings.json
-        using var stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.appsettings.json"); 
-        if (stream != null)
-        {
-            var config = new ConfigurationBuilder().AddJsonStream(stream).Build();
-            builder.Configuration.AddConfiguration(config);
-        }
-        ```
+![image](https://github.com/user-attachments/assets/9e169556-c279-4f95-abcc-27a3da8da699)
+![image](https://github.com/user-attachments/assets/557ab8e8-3f4a-42cb-bcab-9421ee0db327)
+![image](https://github.com/user-attachments/assets/e0cb10df-2bd6-4618-9c70-b9113db92f40)
+![image](https://github.com/user-attachments/assets/1542ff06-672c-4b85-bdb9-23f03b8470b8)
+![image](https://github.com/user-attachments/assets/dc1f991d-c649-4867-b153-f550dad942a4)
+![image](https://github.com/user-attachments/assets/fb5cdc1c-d819-4736-a0fe-6e8c7c0c8b2e)
 
 ## **Đóng góp**
 
