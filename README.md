@@ -1,6 +1,6 @@
 <div align="center">
 
-# **Bookstore.Mobile - Bookstore Management Application**
+# **.NETMAUI App Bookstore.Mobile - Bookstore Management Application**
 
 A Modern and User-Friendly Interface for the Bookstore Management System
 
